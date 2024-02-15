@@ -38,6 +38,11 @@ export interface Comment {
 }
 
 
+export interface UploadError {
+    type: string;
+    message: string;
+}
+
 ///////////////
 
 // COMPONENT TYPES
