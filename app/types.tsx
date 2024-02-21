@@ -8,6 +8,14 @@ export interface RandomUsers {
 }
 
 
+export interface CropperDimensions {
+    height?: number | null;
+    width?: number | null;
+    left?: number | null;
+    top?: number | null;
+}
+
+
 export interface Like {
     id: string;
     user_id: string;
@@ -47,6 +55,11 @@ export interface Comment {
 }
 
 
+export interface ShowErrorObject {
+    type: string;
+    message: string;
+}
+
 export interface UploadError {
     type: string;
     message: string;
@@ -71,6 +84,14 @@ export interface ProfilePageTypes {
 
 export interface PostUserCompTypes {
     post: Post
+}
+
+export interface TextInputCompTypes {
+    string: string;
+    inputType: string;
+    placeholder: string;
+    onUpdate: (newValue: string) => void;
+    error: string;
 }
 
 //////////////////////
