@@ -44,6 +44,10 @@ export default function EditProfileOverlay() {
         return ''
     }
 
+    const cropAndUpdateImage = async () => {
+        console.log("crop image")
+    }
+
 
     return (
         <>
