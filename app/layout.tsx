@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import AuthOverlay from "./components/AuthOverlay";
+
+import UserProvider from "./context/user";
+import AllOverlays from "./components/AllOverlays";
 
 
 export const metadata: Metadata = {
@@ -16,11 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <UserProvider> 
+        <body>
+          <AllOverlays/>
+          {children}
+        </body>
+      </UserProvider>
       
-      <body>
-        <AuthOverlay/>
-        {children}
-      </body>
     </html>
   );
 }
