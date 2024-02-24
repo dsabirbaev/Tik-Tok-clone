@@ -3,13 +3,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import TextInput from "../TextInput";
 import { useUser } from "@/app/context/user";
-
+import { useGeneralStore } from "@/app/stores/general";
 
 //// react icons
 import { BiLoaderCircle } from "react-icons/bi";
+
+
 export default function Register() {
    
-   
+    let { setIsLoginOpen } =  useGeneralStore();
     const contextUser = useUser()
     const router = useRouter()
 
@@ -66,7 +68,7 @@ export default function Register() {
             setLoading(true)
             await contextUser.register(name, email, password)
             setLoading(false)
-            // setIsLoginOpen(false)
+            setIsLoginOpen(false)
             router.refresh()
             
         } catch (error) {

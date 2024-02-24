@@ -6,34 +6,41 @@ import { useState } from "react";
 import ClientOnly from "../ClientOnly";
 import SingleComment from "./SingleComment";
 import { CommentsCompTypes } from "@/app/types";
-
+import { useCommentStore } from "@/app/stores/comment";
+import { useGeneralStore } from "@/app/stores/general";
+import { useUser } from "@/app/context/user";
+import useCreateComment from '@/app/hooks/useCreateComment' 
 
 import { BiLoaderCircle } from "react-icons/bi";
+
 export default function Comments({ params }: CommentsCompTypes) { 
+
+    let { commentsByPost, setCommentsByPost} = useCommentStore();
+    let { setIsLoginOpen} = useGeneralStore();
+
+    const contextUser = useUser();
 
     const [comment, setComment] = useState<string>('')
     const [inputFocused, setInputFocused] = useState<boolean>(false)
     const [isUploading, setIsUploading] = useState<boolean>(false)
 
 
-    const commentsByPost = [
-        {
-            id: "123",
-            user_id: "34",
-            post_id: "445",
-            text: "this is text",
-            created_at: "date here",
-            profile: {
-            user_id: "456",
-            name: "User 1",
-            image: "https://placehold.co/100",
-            }
-        }
-    ]
+   
 
 
     const addComment = async () => {
-        console.log("add comment")
+        if (!contextUser?.user) return setIsLoginOpen(true)
+
+        try {
+            setIsUploading(true)
+            await useCreateComment(contextUser?.user?.id, params?.postId, comment)
+            setCommentsByPost(params?.postId)
+            setComment('')
+            setIsUploading(false)
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
     }
 
     return (

@@ -3,17 +3,39 @@
 import { useState } from "react"
 import Link from "next/link"
 import { SingleCommentCompTypes } from "@/app/types"
+import { useUser } from "@/app/context/user"
+import { useCommentStore } from "@/app/stores/comment"
+
+//// hooks
+import useDeleteComment from "@/app/hooks/useDeleteComment"
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl"
+
 //// react icons
 import { BiLoaderCircle } from "react-icons/bi"
 import { BsTrash3 } from "react-icons/bs"
 
+
+
 export default function SingleComment({ comment, params }: SingleCommentCompTypes) {
 
+
+    const contextUser = useUser()
+    let { setCommentsByPost } = useCommentStore()
     const [isDeleting, setIsDeleting] = useState(false)
 
     const deleteThisComment = async () => {
         let res = confirm("Are you sure you weant to delete this comment?")
         if (!res) return
+
+        try {
+            setIsDeleting(true)
+            await useDeleteComment(comment?.id)
+            setCommentsByPost(params?.postId)
+            setIsDeleting(false)
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
     }
     return (
         <>
@@ -23,7 +45,7 @@ export default function SingleComment({ comment, params }: SingleCommentCompType
                         <img 
                             className="absolute top-0 rounded-full lg:mx-0 mx-auto" 
                             width="40" 
-                            src={comment.profile.image}
+                            src={useCreateBucketUrl(comment.profile.image)}
                         />
                     </Link>
 
@@ -38,7 +60,7 @@ export default function SingleComment({ comment, params }: SingleCommentCompType
                             </span>
 
 
-                            {true ? (
+                            {contextUser?.user?.id == comment.profile.user_id  ? (
                                 <button 
                                     disabled={isDeleting} 
                                     onClick={() => deleteThisComment()}
