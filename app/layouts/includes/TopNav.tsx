@@ -2,14 +2,26 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import debounce  from "debounce"
 import { useRouter, usePathname } from "next/navigation";
+
+
 /// iocns react
 import { BiSearch, BiUser } from "react-icons/bi";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi"
+
+//// hooks
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl"
+import useSearchProfilesByName from "@/app/hooks/useSearchProfilesByName";
+
+//// store
 import { useUser } from "@/app/context/user";
 import { useGeneralStore } from "@/app/stores/general";
+
+
 import { RandomUsers } from "@/app/types";
 
 export default function TopNav() {
@@ -18,15 +30,26 @@ export default function TopNav() {
     const router = useRouter();
     const pathname = usePathname();
 
+
     const [searchProfiles, setSearchProfiles] = useState<RandomUsers[]>([])
     let [showMenu, setShowMenu] = useState<boolean>(false)
     let { setIsLoginOpen, setIsEditProfileOpen } = useGeneralStore()
 
     useEffect(() => { setIsEditProfileOpen(false) }, [])
     
-    const handleSearchName = (e) => {
-        console.log(e)
-    }
+    const handleSearchName = debounce(async (event: { target: { value: string } }) => {
+        if (event.target.value == "") return setSearchProfiles([])
+
+        try {
+            const result = await useSearchProfilesByName(event.target.value)
+            if (result) return setSearchProfiles(result)
+            setSearchProfiles([])
+        } catch (error) {
+            console.log(error)
+            setSearchProfiles([])
+            alert(error)
+        }
+    }, 500)
 
     const goTo = () => {
         if (!userContext?.user) return setIsLoginOpen(true)
@@ -52,19 +75,23 @@ export default function TopNav() {
                             placeholder="Search accounts"
                         />
 
-                        <div className="absolute bg-white max-w-[910px] h-auto w-full z-20 left-0 top-12 border p-1">
-                            <div className="p-1">
-                                <Link 
-                                    href={`/profile/1`}
-                                    className="flex items-center justify-between w-full cursor-pointer hover:bg-[#F12B56] p-1 px-2 hover:text-white"
-                                >
-                                    <div className="flex items-center">
-                                        <img className="rounded-md" width="40" src="" />
-                                        <div className="truncate ml-2">Davranbek</div>
+                        {searchProfiles.length > 0 ?
+                            <div className="absolute bg-white max-w-[910px] h-auto w-full z-20 left-0 top-12 border p-1">
+                                {searchProfiles.map((profile, index) => (
+                                    <div className="p-1" key={index}>
+                                        <Link 
+                                            href={`/profile/${profile?.id}`}
+                                            className="flex items-center justify-between w-full cursor-pointer hover:bg-[#F12B56] p-1 px-2 hover:text-white"
+                                        >
+                                            <div className="flex items-center">
+                                                <img className="rounded-md" width="40" src={useCreateBucketUrl(profile?.image)} />
+                                                <div className="truncate ml-2">{ profile?.name }</div>
+                                            </div>
+                                        </Link>
                                     </div>
-                                </Link>
+                                ))}
                             </div>
-                        </div>
+                        : null}
 
                         <div className="px-3 py-1 flex items-center border-l border-l-gray-300">
                             <BiSearch color="#A1A2A7" size="22" />
@@ -97,9 +124,9 @@ export default function TopNav() {
                                 <div className="flex items-center">
                                     <div className="relative">
                                         <button onClick={() => setShowMenu(showMenu = !showMenu)}  className="mt-1 border-gray-200 rounded-full">
-                                            <img className="rounded-full w-[35px] h-[35px]" src="#" />
+                                            <img className="rounded-full w-[35px] h-[35px]" src={useCreateBucketUrl(userContext?.user?.image || '')}  />
                                         </button>
-
+                                        
                                         {showMenu ? (
                                             <div className="absolute bg-white rounded-lg py-1.5 w-[200px] shadow-xl border top-[40px] right-0">
                                                 <button 

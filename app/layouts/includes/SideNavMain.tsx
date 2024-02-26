@@ -1,4 +1,6 @@
 
+
+import { useEffect } from "react"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MenuItem from "./MenuItem";
@@ -6,12 +8,22 @@ import ClientOnly from "@/app/components/ClientOnly";
 import MenuItemFollow from "./MenuItemFollow";
 
 
+//// store
+import { useUser } from "@/app/context/user"
+import { useGeneralStore } from "@/app/stores/general"
+
 export default function SideNavMain(){
 
+    let { setRandomUsers, randomUsers} = useGeneralStore()
+
+    const contextUser = useUser()
     const pathname = usePathname();
+
+    useEffect(() => { setRandomUsers() }, [])
     return (    
         <>  
             <div 
+                id="SideNavMain" 
                 className={`
                     fixed z-20 bg-white pt-[70px] h-full lg:border-r-0 border-r w-[75px] overflow-auto
                     ${pathname === '/' ? 'lg:w-[310px]' : 'lg:w-[220px]'}
@@ -35,16 +47,16 @@ export default function SideNavMain(){
 
                     <ClientOnly>
                         <div className="cursor-pointer">
-                           
-                            <MenuItemFollow  user={{ id: "1", name: "Test user", image: "#" }} /> 
-                           
+                            {randomUsers?.map((user, index) => ( 
+                                <MenuItemFollow key={index} user={user} /> 
+                            ))}
                         </div>
                     </ClientOnly>
 
                     <button className="lg:block hidden text-[#F02C56] pt-1.5 pl-2 text-[13px]">See all</button>
 
 
-                    {true ? (
+                    {contextUser?.user?.id ? (
                         <div >
                             <div className="border-b lg:ml-2 mt-2" />
                             <h3 className="lg:block hidden text-xs text-gray-600 font-semibold pt-4 pb-2 px-2">Following accounts</h3>
@@ -52,8 +64,9 @@ export default function SideNavMain(){
                             <div className="lg:hidden block pt-3" />
                             <ClientOnly>
                                 <div className="cursor-pointer">
-                                    <MenuItemFollow  user={{ id: "1", name: "Test user", image: "#" }} /> 
-                           
+                                    {randomUsers?.map((user, index) => ( 
+                                        <MenuItemFollow key={index} user={user} /> 
+                                    ))}
                                 </div>
                             </ClientOnly>
 
