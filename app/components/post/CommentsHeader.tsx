@@ -2,7 +2,7 @@
 
 
 import { useEffect, useState } from "react";
-
+import moment from "moment"
 import { CommentsHeaderCompTypes } from "@/app/types";
 import { useRouter } from "next/navigation"
 
@@ -146,7 +146,7 @@ export default function CommentsHeader({ post, params }: CommentsHeaderCompTypes
                         <div className="relative z-0 text-[13px] -mt-5 font-light">
                             {post?.profile.name}
                             <span className="relative -top-[2px] text-[30px] pl-1 pr-0.5 ">.</span>
-                            <span className="font-medium">{post?.created_at}</span>
+                            <span className="font-medium">{moment(post?.created_at).calendar()}</span>
                         </div>
                     </div>
 
@@ -189,7 +189,7 @@ export default function CommentsHeader({ post, params }: CommentsHeaderCompTypes
                         </button>
 
                         <span className="text-xs pl-2 pr-4 text-gray-800 font-semibold">
-                            123
+                            {likesByPost.length}
                         </span>
                     </div>
                 </ClientOnly>

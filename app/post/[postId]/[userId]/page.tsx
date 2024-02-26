@@ -7,33 +7,50 @@ import { useRouter } from "next/navigation";
 import ClientOnly from "@/app/components/ClientOnly";
 import CommentsHeader from "@/app/components/post/CommentsHeader";
 import Comments from "@/app/components/post/Comments";
+
+
+
+//// store
+import { usePostStore } from "@/app/stores/post"
+import { useLikeStore } from "@/app/stores/like"
+import { useCommentStore } from "@/app/stores/comment"
+
+
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl"
+
 //// react icons
 import { AiOutlineClose } from "react-icons/ai"
 import { BiChevronDown, BiChevronUp } from "react-icons/bi"
 
 export default function Post({ params }: PostPageTypes) {
 
+    let { postById, postsByUser, setPostById, setPostsByUser } = usePostStore()
+    let { setLikesByPost } = useLikeStore()
+    let { setCommentsByPost } = useCommentStore()
+
     const router = useRouter()
 
-    const postById = {
-        id: "123",
-        user_id: "34",
-        video_url: "/beach.mp4",
-        text: "this is text",
-        created_at: "date here",
-        profile: {
-          user_id: "456",
-          name: "User 1",
-          image: "https://placehold.co/100",
-        }
-    }
+    useEffect(() => { 
+        setPostById(params.postId)
+        setCommentsByPost(params.postId) 
+        setLikesByPost(params.postId)
+        setPostsByUser(params.userId) 
+    }, [])
 
     const loopThroughPostsUp = () => {
-       console.log("up")
+        postsByUser.forEach(post => {
+            if (post.id > params.postId) {
+                router.push(`/post/${post.id}/${params.userId}`)
+            }
+        });
     }
 
     const loopThroughPostsDown = () => {
-       console.log("down")
+        postsByUser.forEach(post => {
+            if (post.id < params.postId) {
+                router.push(`/post/${post.id}/${params.userId}`)
+            }
+        });
     }
 
     return (
@@ -72,11 +89,11 @@ export default function Post({ params }: PostPageTypes) {
                         src="/images/tiktok-logo-small.png"
                     />
 
-                    <ClientOnly> 
+                    <ClientOnly>
                         {postById?.video_url ? (
                             <video 
                                 className="fixed object-cover w-full my-auto z-[0] h-screen" 
-                                src="/beach.mp4"
+                                src={useCreateBucketUrl(postById?.video_url)}
                             />
                         ) : null}
 
@@ -88,23 +105,23 @@ export default function Post({ params }: PostPageTypes) {
                                     loop
                                     muted
                                     className="h-screen mx-auto" 
-                                    src="/beach.mp4"
+                                    src={useCreateBucketUrl(postById.video_url)}
                                 />
                             ) : null}
                         </div>
                     </ClientOnly>
+
                 </div>
-                
+
                 <div id="InfoSection" className="lg:max-w-[550px] relative w-full h-full bg-white">
                     <div className="py-7" />
 
                         <ClientOnly>
-                            {postById?.video_url ? (
+                            {postById ? (
                                 <CommentsHeader post={postById} params={params}/>
                             ) : null}
                         </ClientOnly>
                         <Comments params={params}/>
-
 
                 </div>
             </div>

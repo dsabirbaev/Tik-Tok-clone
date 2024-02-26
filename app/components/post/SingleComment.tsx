@@ -6,6 +6,9 @@ import { SingleCommentCompTypes } from "@/app/types"
 import { useUser } from "@/app/context/user"
 import { useCommentStore } from "@/app/stores/comment"
 
+
+import moment from "moment"
+
 //// hooks
 import useDeleteComment from "@/app/hooks/useDeleteComment"
 import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl"
@@ -55,7 +58,7 @@ export default function SingleComment({ comment, params }: SingleCommentCompType
                             <span className="flex items-center">
                                 {comment?.profile?.name} - 
                                 <span className="text-[12px] text-gray-600 font-light ml-1">
-                                    {comment?.created_at}
+                                    {moment(comment?.created_at).calendar()}
                                 </span>
                             </span>
 
